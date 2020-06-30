@@ -281,6 +281,7 @@ class Door(WorldObj):
 class Key(WorldObj):
     def __init__(self, color='blue'):
         super(Key, self).__init__('key', color)
+        self.pos = None
 
     def can_pickup(self):
         return True

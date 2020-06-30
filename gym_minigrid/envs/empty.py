@@ -6,7 +6,6 @@ class EmptyEnv(MiniGridEnv):
     """
     Empty grid environment, no obstacles, sparse reward
     """
-
     def __init__(
         self,
         size=8,

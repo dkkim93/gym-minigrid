@@ -1,15 +1,16 @@
 from .minigrid import *
 
+
 def reject_next_to(env, pos):
     """
     Function to filter out object positions that are right next to
     the agent's starting point
     """
-
     sx, sy = env.agent_pos
     x, y = pos
     d = abs(sx - x) + abs(sy - y)
     return d < 2
+
 
 class Room:
     def __init__(
@@ -60,6 +61,7 @@ class Room:
 
         return True
 
+
 class RoomGrid(MiniGridEnv):
     """
     Environment with multiple rooms and random objects.
@@ -102,8 +104,8 @@ class RoomGrid(MiniGridEnv):
         assert x >= 0
         assert y >= 0
 
-        i = x // (self.room_size-1)
-        j = y // (self.room_size-1)
+        i = x // (self.room_size - 1)
+        j = y // (self.room_size - 1)
 
         assert i < self.num_cols
         assert j < self.num_rows
@@ -128,7 +130,7 @@ class RoomGrid(MiniGridEnv):
             # For each column of rooms
             for i in range(0, self.num_cols):
                 room = Room(
-                    (i * (self.room_size-1), j * (self.room_size-1)),
+                    (i * (self.room_size - 1), j * (self.room_size - 1)),
                     (self.room_size, self.room_size)
                 )
                 row.append(room)
@@ -149,30 +151,26 @@ class RoomGrid(MiniGridEnv):
 
                 # Door positions, order is right, down, left, up
                 if i < self.num_cols - 1:
-                    room.neighbors[0] = self.room_grid[j][i+1]
+                    room.neighbors[0] = self.room_grid[j][i + 1]
                     room.door_pos[0] = (x_m, self._rand_int(y_l, y_m))
                 if j < self.num_rows - 1:
-                    room.neighbors[1] = self.room_grid[j+1][i]
+                    room.neighbors[1] = self.room_grid[j + 1][i]
                     room.door_pos[1] = (self._rand_int(x_l, x_m), y_m)
                 if i > 0:
-                    room.neighbors[2] = self.room_grid[j][i-1]
+                    room.neighbors[2] = self.room_grid[j][i - 1]
                     room.door_pos[2] = room.neighbors[2].door_pos[0]
                 if j > 0:
-                    room.neighbors[3] = self.room_grid[j-1][i]
+                    room.neighbors[3] = self.room_grid[j - 1][i]
                     room.door_pos[3] = room.neighbors[3].door_pos[1]
 
-        # The agent starts in the middle, facing right
-        self.agent_pos = (
-            (self.num_cols // 2) * (self.room_size-1) + (self.room_size // 2),
-            (self.num_rows // 2) * (self.room_size-1) + (self.room_size // 2)
-        )
+        # The agent starts in the upper left corner
+        self.agent_pos = (1, 1)
         self.agent_dir = 0
 
     def place_in_room(self, i, j, obj):
         """
         Add an existing object to room (i, j)
         """
-
         room = self.get_room(i, j)
 
         pos = self.place_obj(
@@ -192,10 +190,10 @@ class RoomGrid(MiniGridEnv):
         Add a new object to room (i, j)
         """
 
-        if kind == None:
+        if kind is None:
             kind = self._rand_elem(['key', 'ball', 'box'])
 
-        if color == None:
+        if color is None:
             color = self._rand_color()
 
         # TODO: we probably want to add an Object.make helper function
@@ -209,14 +207,13 @@ class RoomGrid(MiniGridEnv):
 
         return self.place_in_room(i, j, obj)
 
-    def add_door(self, i, j, door_idx=None, color=None, locked=None):
+    def add_door(self, i, j, pos, door_idx=None, color=None, locked=None):
         """
         Add a door to a room, connecting it to a neighbor
         """
-
         room = self.get_room(i, j)
 
-        if door_idx == None:
+        if door_idx is None:
             # Need to make sure that there is a neighbor along this wall
             # and that there is not already a door
             while True:
@@ -224,7 +221,7 @@ class RoomGrid(MiniGridEnv):
                 if room.neighbors[door_idx] and room.doors[door_idx] is None:
                     break
 
-        if color == None:
+        if color is None:
             color = self._rand_color()
 
         if locked is None:
@@ -235,13 +232,9 @@ class RoomGrid(MiniGridEnv):
         room.locked = locked
         door = Door(color, is_locked=locked)
 
-        pos = room.door_pos[door_idx]
         self.grid.set(*pos, door)
         door.cur_pos = pos
-
-        neighbor = room.neighbors[door_idx]
         room.doors[door_idx] = door
-        neighbor.doors[(door_idx+2) % 4] = door
 
         return door, pos
 
@@ -279,16 +272,16 @@ class RoomGrid(MiniGridEnv):
 
         # Mark the rooms as connected
         room.doors[wall_idx] = True
-        neighbor.doors[(wall_idx+2) % 4] = True
+        neighbor.doors[(wall_idx + 2) % 4] = True
 
     def place_agent(self, i=None, j=None, rand_dir=True):
         """
         Place the agent in a room
         """
 
-        if i == None:
+        if i is None:
             i = self._rand_int(0, self.num_cols)
-        if j == None:
+        if j is None:
             j = self._rand_int(0, self.num_rows)
 
         room = self.room_grid[j][i]
@@ -384,9 +377,9 @@ class RoomGrid(MiniGridEnv):
             # Add the object to a random room if no room specified
             room_i = i
             room_j = j
-            if room_i == None:
+            if room_i is None:
                 room_i = self._rand_int(0, self.num_cols)
-            if room_j == None:
+            if room_j is None:
                 room_j = self._rand_int(0, self.num_rows)
 
             dist, pos = self.add_object(room_i, room_j, *obj)
