@@ -10,8 +10,7 @@ def load_env(env_name):
 
 
 if __name__ == "__main__":
-    # env = load_env("MiniGrid-Empty-5x5-v0")
-    env = load_env("MiniGrid-Unlock-v0")
+    env = load_env("MiniGrid-Unlock-v0")  # Either "MiniGrid-Empty-5x5-v0" or "MiniGrid-Unlock-v0"
     obs = env.reset(task=(3, 3))
     while True:
         env.render()
