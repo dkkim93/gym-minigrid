@@ -684,12 +684,9 @@ class MiniGridEnv(gym.Env):
         self.observation_space = spaces.Box(
             low=0,
             high=255,
-            shape=(self.agent_view_size, self.agent_view_size, 3),
+            shape=(84, 84, 3),
             dtype='uint8'
         )
-        self.observation_space = spaces.Dict({
-            'image': self.observation_space
-        })
 
         # Range of possible rewards
         self.reward_range = (0, 1)
@@ -713,7 +710,7 @@ class MiniGridEnv(gym.Env):
         # Initialize the state
         self.reset()
 
-    def reset(self):
+    def reset(self, task=None):
         # Current position and direction of the agent
         self.agent_pos = None
         self.agent_dir = None
@@ -722,6 +719,10 @@ class MiniGridEnv(gym.Env):
         # To keep the same grid for each episode, call env.seed() with
         # the same seed before calling env.reset()
         self._gen_grid(self.width, self.height)
+
+        # Set task
+        if task is not None:
+            self._set_task(task)
 
         # These fields should be defined by _gen_grid
         assert self.agent_pos is not None
@@ -823,14 +824,13 @@ class MiniGridEnv(gym.Env):
     def _gen_grid(self, width, height):
         assert False, "_gen_grid needs to be implemented by each environment"
 
-    def set_task(self, task):
+    def _set_task(self, task):
         assert False, "set_task needs to be implemented by each environment"
 
     def _reward(self):
         """
         Compute the reward to be given upon success
         """
-
         return 1 - 0.9 * (self.step_count / self.max_steps)
 
     def _rand_int(self, low, high):
@@ -1166,6 +1166,9 @@ class MiniGridEnv(gym.Env):
         else:
             assert False, "unknown action"
 
+        # Get reward
+        reward = self._reward()
+
         if self.step_count >= self.max_steps:
             done = True
 
@@ -1246,7 +1249,7 @@ class MiniGridEnv(gym.Env):
 
         return img
 
-    def render(self, mode='human', close=False, highlight=True, tile_size=TILE_PIXELS):
+    def render(self, mode='human', close=False, highlight=False, tile_size=TILE_PIXELS):
         """
         Render the whole-grid human view
         """

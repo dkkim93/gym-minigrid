@@ -1,11 +1,12 @@
 import math
+import cv2
 import operator
 from functools import reduce
-
 import numpy as np
 import gym
-from gym import error, spaces, utils
+from gym import spaces
 from .minigrid import OBJECT_TO_IDX, COLOR_TO_IDX, STATE_TO_IDX
+
 
 class ReseedWrapper(gym.core.Wrapper):
     """
@@ -28,6 +29,7 @@ class ReseedWrapper(gym.core.Wrapper):
     def step(self, action):
         obs, reward, done, info = self.env.step(action)
         return obs, reward, done, info
+
 
 class ActionBonus(gym.core.Wrapper):
     """
@@ -62,6 +64,7 @@ class ActionBonus(gym.core.Wrapper):
 
     def reset(self, **kwargs):
         return self.env.reset(**kwargs)
+
 
 class StateBonus(gym.core.Wrapper):
     """
@@ -98,6 +101,7 @@ class StateBonus(gym.core.Wrapper):
     def reset(self, **kwargs):
         return self.env.reset(**kwargs)
 
+
 class ImgObsWrapper(gym.core.ObservationWrapper):
     """
     Use the image as the only observation output, no language/mission.
@@ -109,6 +113,7 @@ class ImgObsWrapper(gym.core.ObservationWrapper):
 
     def observation(self, obs):
         return obs['image']
+
 
 class OneHotPartialObsWrapper(gym.core.ObservationWrapper):
     """
@@ -152,6 +157,7 @@ class OneHotPartialObsWrapper(gym.core.ObservationWrapper):
             'image': out
         }
 
+
 class RGBImgObsWrapper(gym.core.ObservationWrapper):
     """
     Wrapper to use fully observable RGB image as the only observation output,
@@ -159,31 +165,20 @@ class RGBImgObsWrapper(gym.core.ObservationWrapper):
     gridworld in pixel space.
     """
 
-    def __init__(self, env, tile_size=8):
+    def __init__(self, env):
         super().__init__(env)
-
-        self.tile_size = tile_size
-
-        self.observation_space.spaces['image'] = spaces.Box(
-            low=0,
-            high=255,
-            shape=(self.env.width * tile_size, self.env.height * tile_size, 3),
-            dtype='uint8'
-        )
+        self.observation_space = env.observation_space
 
     def observation(self, obs):
         env = self.unwrapped
-
         rgb_img = env.render(
             mode='rgb_array',
-            highlight=False,
-            tile_size=self.tile_size
-        )
-
-        return {
-            'mission': obs['mission'],
-            'image': rgb_img
-        }
+            highlight=False)
+        reshape_img = cv2.resize(
+            rgb_img, 
+            dsize=(self.observation_space.shape[0], self.observation_space.shape[1]), 
+            interpolation=cv2.INTER_NEAREST)
+        return reshape_img
 
 
 class RGBImgPartialObsWrapper(gym.core.ObservationWrapper):
