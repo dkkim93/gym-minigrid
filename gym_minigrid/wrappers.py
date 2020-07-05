@@ -1,11 +1,12 @@
 import math
 import cv2
 import operator
-from functools import reduce
-import numpy as np
 import gym
+import numpy as np
 from gym import spaces
+from functools import reduce
 from .minigrid import OBJECT_TO_IDX, COLOR_TO_IDX, STATE_TO_IDX
+from .minigrid import Goal
 
 
 class ReseedWrapper(gym.core.Wrapper):
@@ -164,7 +165,6 @@ class RGBImgObsWrapper(gym.core.ObservationWrapper):
     no language/mission. This can be used to have the agent to solve the
     gridworld in pixel space.
     """
-
     def __init__(self, env):
         super().__init__(env)
         self.observation_space = env.observation_space
@@ -179,6 +179,48 @@ class RGBImgObsWrapper(gym.core.ObservationWrapper):
             dsize=(self.observation_space.shape[0], self.observation_space.shape[1]), 
             interpolation=cv2.INTER_NEAREST)
         return reshape_img
+
+
+class VectorObsWrapper(gym.core.ObservationWrapper):
+    """
+    Wrapper for vector observation with the following format:
+    [
+        agent pos (2), 
+        agent orientation (1),
+        goal pos (2), 
+        goal info (1), 
+        item pos (2),
+    ] = (8,)
+    """
+    def __init__(self, env):
+        super().__init__(env)
+        self.observation_space = spaces.Box(
+            low=-np.inf,
+            high=np.inf,
+            shape=(8,),
+            dtype=np.float32)
+
+    def observation(self, obs):
+        env = self.unwrapped
+        if "Unlock" in env.__class__.__name__:
+            goal_pos = env.door_pos
+            goal_info = np.array([int(env.door.is_open)])
+            item_pos = env.key.cur_pos if env.carrying is None else np.array([-1, -1])
+        elif "Empty" in env.__class__.__name__:
+            goal_pos = env.goal_pos
+            goal_info = np.array([-1])
+            item_pos = np.array([-1, -1])
+        else:
+            raise NotImplementedError()
+        agent_pos = env.agent_pos
+        agent_dir = np.array([env.agent_dir])
+        obs = np.concatenate([
+            agent_pos,
+            agent_dir,
+            goal_pos,
+            goal_info,
+            item_pos])
+        return obs
 
 
 class RGBImgPartialObsWrapper(gym.core.ObservationWrapper):
@@ -213,6 +255,7 @@ class RGBImgPartialObsWrapper(gym.core.ObservationWrapper):
             'image': rgb_img_partial
         }
 
+
 class FullyObsWrapper(gym.core.ObservationWrapper):
     """
     Fully observable gridworld using a compact grid encoding
@@ -241,6 +284,7 @@ class FullyObsWrapper(gym.core.ObservationWrapper):
             'mission': obs['mission'],
             'image': full_grid
         }
+
 
 class FlatObsWrapper(gym.core.ObservationWrapper):
     """
@@ -293,6 +337,7 @@ class FlatObsWrapper(gym.core.ObservationWrapper):
 
         return obs
 
+
 class ViewSizeWrapper(gym.core.Wrapper):
     """
     Wrapper to customize the agent field of view size.
@@ -327,13 +372,13 @@ class ViewSizeWrapper(gym.core.Wrapper):
     def step(self, action):
         return self.env.step(action)
 
-from .minigrid import Goal
+
 class DirectionObsWrapper(gym.core.ObservationWrapper):
     """
     Provides the slope/angular direction to the goal with the observations as modeled by (y2 - y2 )/( x2 - x1)
     type = {slope , angle}
     """
-    def __init__(self, env,type='slope'):
+    def __init__(self, env, type='slope'):
         super().__init__(env)
         self.goal_position = None
         self.type = type
@@ -341,12 +386,12 @@ class DirectionObsWrapper(gym.core.ObservationWrapper):
     def reset(self):
         obs = self.env.reset()
         if not self.goal_position:
-            self.goal_position = [x for x,y in enumerate(self.grid.grid) if isinstance(y,(Goal) ) ]
-            if len(self.goal_position) >= 1: # in case there are multiple goals , needs to be handled for other env types
-                self.goal_position = (int(self.goal_position[0]/self.height) , self.goal_position[0]%self.width)
+            self.goal_position = [x for x, y in enumerate(self.grid.grid) if isinstance(y, (Goal))]
+            if len(self.goal_position) >= 1:  # in case there are multiple goals , needs to be handled for other env types
+                self.goal_position = (int(self.goal_position[0] / self.height), self.goal_position[0] % self.width)
         return obs
 
     def observation(self, obs):
-        slope = np.divide( self.goal_position[1] - self.agent_pos[1] ,  self.goal_position[0] - self.agent_pos[0])
-        obs['goal_direction'] = np.arctan( slope ) if self.type == 'angle' else slope
+        slope = np.divide(self.goal_position[1] - self.agent_pos[1], self.goal_position[0] - self.agent_pos[0])
+        obs['goal_direction'] = np.arctan(slope) if self.type == 'angle' else slope
         return obs
