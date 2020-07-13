@@ -187,17 +187,17 @@ class VectorObsWrapper(gym.core.ObservationWrapper):
     [
         agent pos (2), 
         agent orientation (1),
-        goal pos (2), 
+        # goal pos (2), 
         goal info (1), 
         item pos (2),
-    ] = (8,)
+    ] = (6,)
     """
     def __init__(self, env):
         super().__init__(env)
         self.observation_space = spaces.Box(
             low=-np.inf,
             high=np.inf,
-            shape=(8,),
+            shape=(6,),
             dtype=np.float32)
 
     def observation(self, obs):
