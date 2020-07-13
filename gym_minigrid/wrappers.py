@@ -203,11 +203,11 @@ class VectorObsWrapper(gym.core.ObservationWrapper):
     def observation(self, obs):
         env = self.unwrapped
         if "Unlock" in env.__class__.__name__:
-            goal_pos = env.door_pos
+            # goal_pos = env.door_pos
             goal_info = np.array([int(env.door.is_open)])
             item_pos = env.key.cur_pos if env.carrying is None else np.array([-1, -1])
         elif "Empty" in env.__class__.__name__:
-            goal_pos = env.goal_pos
+            # goal_pos = env.goal_pos
             goal_info = np.array([-1])
             item_pos = np.array([-1, -1])
         else:
@@ -217,7 +217,7 @@ class VectorObsWrapper(gym.core.ObservationWrapper):
         obs = np.concatenate([
             agent_pos,
             agent_dir,
-            goal_pos,
+            # goal_pos,
             goal_info,
             item_pos])
         return obs
