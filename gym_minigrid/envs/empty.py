@@ -15,6 +15,7 @@ class EmptyEnv(MiniGridEnv):
         self.size = size + 2  # Considering the surrounding walls
         self.agent_start_pos = agent_start_pos
         self.agent_start_dir = agent_start_dir
+        self.goal_pos = None
         self.mission = ""  # Dummy variable
 
         super().__init__(
@@ -37,17 +38,21 @@ class EmptyEnv(MiniGridEnv):
         else:
             self.place_agent()
 
-    def _set_task(self, task):
+    def _reward(self):
+        dist = np.linalg.norm(np.array(self.agent_pos) - self.goal_pos)
+        return -dist
+
+    def reset_task(self, task):
         assert len(task) == 2, "Must in format of (col, row)"
         assert task[0] >= 0 and task[0] < self.size - 2
         assert task[1] >= 0 and task[1] < self.size - 2
         self.goal_pos = np.array(task)
         self.put_obj(Goal(), task[0] + 1, task[1] + 1)
 
-    def _reward(self):
-        dist = np.linalg.norm(np.array(self.agent_pos) - self.goal_pos)
-        return -dist
-
+    def sample_tasks(self, num_tasks):
+        tasks = self.np_random.randint(0, self.size - 2, size=(num_tasks, 2))
+        return tasks
+    
 
 class EmptyEnv5x5(EmptyEnv):
     def __init__(self, **kwargs):
