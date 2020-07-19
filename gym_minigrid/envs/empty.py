@@ -38,6 +38,10 @@ class EmptyEnv(MiniGridEnv):
         else:
             self.place_agent()
 
+        # Set goal
+        assert self.goal_pos is not None, "Goal position is None. Call env.reset_task() before env.reset()"
+        self.put_obj(Goal(), self.goal_pos[0] + 1, self.goal_pos[1] + 1)
+
     def _reward(self):
         dist = np.linalg.norm(np.array(self.agent_pos) - self.goal_pos)
         return -dist
@@ -47,7 +51,6 @@ class EmptyEnv(MiniGridEnv):
         assert task[0] >= 0 and task[0] < self.size - 2
         assert task[1] >= 0 and task[1] < self.size - 2
         self.goal_pos = np.array(task)
-        self.put_obj(Goal(), task[0] + 1, task[1] + 1)
 
     def sample_tasks(self, num_tasks):
         tasks = self.np_random.randint(0, self.size - 2, size=(num_tasks, 2))

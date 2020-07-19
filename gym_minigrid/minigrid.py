@@ -708,9 +708,6 @@ class MiniGridEnv(gym.Env):
         # Initialize the RNG
         self.seed(seed=seed)
 
-        # Initialize the state
-        self.reset()
-
     def reset(self):
         # Current position and direction of the agent
         self.agent_pos = None
