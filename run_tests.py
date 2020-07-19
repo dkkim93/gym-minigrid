@@ -11,9 +11,9 @@ def load_env(env_name):
 
 if __name__ == "__main__":
     env = load_env("MiniGrid-Empty-5x5-v0")  # Either "MiniGrid-Empty-5x5-v0" or "MiniGrid-Unlock-v0"
-    obs = env.reset(task=(3, 3))
+    env.unwrapped.reset_task(task=(3, 3))
+    obs = env.reset()
     while True:
-        print("obs:", obs)
         env.render()
         action = env.action_space.sample()
         next_obs, reward, done, _ = env.step(action)
