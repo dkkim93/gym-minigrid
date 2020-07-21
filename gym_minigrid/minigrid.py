@@ -1298,7 +1298,7 @@ class MiniGridEnv(gym.Env):
 
         if mode == 'human':
             self.window.show_img(img)
-            self.window.set_caption(self.mission)
+            self.window.set_caption("Timestep:" + str(self.step_count))
 
         return img
 
