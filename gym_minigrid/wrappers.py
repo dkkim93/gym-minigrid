@@ -192,6 +192,8 @@ class VectorObsWrapper(gym.core.ObservationWrapper):
         item pos (2),
     ] = (6,)
     """
+    # TODO Change the location not from (0, 0) but from (1, 1)
+    # TODO This is because not available information changed from -1 to 0
     def __init__(self, env):
         super().__init__(env)
         self.observation_space = spaces.Box(
@@ -208,8 +210,8 @@ class VectorObsWrapper(gym.core.ObservationWrapper):
             item_pos = env.key.cur_pos if env.carrying is None else np.array([-1, -1])
         elif "Empty" in env.__class__.__name__:
             # goal_pos = env.goal_pos
-            goal_info = np.array([-1])
-            item_pos = np.array([-1, -1])
+            goal_info = np.array([0])
+            item_pos = np.array([0, 0])
         else:
             raise NotImplementedError()
         agent_pos = env.agent_pos
