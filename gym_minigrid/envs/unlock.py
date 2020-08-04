@@ -47,6 +47,9 @@ class Unlock(RoomGrid):
             if self.door.is_open:
                 done = True
 
+        if self.step_count >= self.max_steps:
+            done = True
+
         return obs, reward, done, info
 
     def reset_task(self, task):
@@ -56,7 +59,7 @@ class Unlock(RoomGrid):
         self.key_pos = np.array(task)
 
     def sample_tasks(self, num_tasks):
-        tasks = self.np_random.randint(1, 6, size=(num_tasks, 2))
+        tasks = self.np_random.randint(2, 6, size=(num_tasks, 2))
         return tasks
 
 
