@@ -228,14 +228,24 @@ class Door(WorldObj):
     def see_behind(self):
         return self.is_open
 
+    # def toggle(self, env, pos):
+    #     # If the player has the right key to open the door
+    #     if self.is_locked:
+    #         if isinstance(env.carrying, Key) and env.carrying.color == self.color:
+    #             self.is_locked = False
+    #             self.is_open = True
+    #             return True
+    #         return False
+
+    #     self.is_open = not self.is_open
+    #     return True
+
     def toggle(self, env, pos):
-        # If the player has the right key to open the door
+        # Enabling easier opening door without requiring a key
         if self.is_locked:
-            if isinstance(env.carrying, Key) and env.carrying.color == self.color:
-                self.is_locked = False
-                self.is_open = True
-                return True
-            return False
+            self.is_locked = False
+            self.is_open = True
+            return True
 
         self.is_open = not self.is_open
         return True
