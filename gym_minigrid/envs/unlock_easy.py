@@ -31,7 +31,7 @@ class UnlockEasy(RoomGrid):
         reward = -dist
 
         if self.door.is_open is True:
-            reward = 1.
+            reward = 10.
 
         done = False
         if self.door.is_open:
