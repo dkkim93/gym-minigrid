@@ -187,10 +187,7 @@ class VectorObsWrapper(gym.core.ObservationWrapper):
     [
         agent pos (2), 
         agent orientation (1),
-        # goal pos (2), 
-        goal info (1), 
-        item pos (2),
-    ] = (6,)
+    ] = (3,)
     """
     # TODO Change the location not from (0, 0) but from (1, 1)
     # TODO This is because not available information changed from -1 to 0
@@ -199,32 +196,15 @@ class VectorObsWrapper(gym.core.ObservationWrapper):
         self.observation_space = spaces.Box(
             low=-np.inf,
             high=np.inf,
-            shape=(6,),
+            shape=(3,),
             dtype=np.float32)
 
     def observation(self, obs):
         env = self.unwrapped
 
-        if "Unlock" in env.__class__.__name__:
-            # goal_pos = env.door_pos
-            goal_info = np.array([int(env.door.is_open)])
-            # item_pos = env.key.cur_pos if env.carrying is None else np.array([0., 0.])
-            item_pos = np.array([0, 0])
-        elif "Empty" in env.__class__.__name__:
-            # goal_pos = env.goal_pos
-            goal_info = np.array([0])
-            item_pos = np.array([0, 0])
-        else:
-            raise NotImplementedError()
-
         agent_pos = env.agent_pos
         agent_dir = np.array([env.agent_dir])
-        obs = np.concatenate([
-            agent_pos,
-            agent_dir,
-            # goal_pos,
-            goal_info,
-            item_pos])
+        obs = np.concatenate([agent_pos, agent_dir])
 
         return obs
 

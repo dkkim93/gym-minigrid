@@ -223,7 +223,7 @@ class Door(WorldObj):
 
     def can_overlap(self):
         """The agent can only walk over this cell when the door is open"""
-        return self.is_open
+        return False
 
     def see_behind(self):
         return self.is_open
@@ -648,20 +648,10 @@ class MiniGridEnv(gym.Env):
 
     # Enumeration of possible actions
     class Actions(IntEnum):
-        # Turn left, turn right, move forward
         left = 0
         right = 1
         forward = 2
-
-        # Pick up an object
-        pickup = 3
-        # Drop an object
-        drop = 4
-        # Toggle/activate an object
-        toggle = 5
-
-        # Done completing task
-        done = 6
+        toggle = 3
 
     def __init__(
         self,
@@ -1142,30 +1132,13 @@ class MiniGridEnv(gym.Env):
                 reward = self._reward()
             if fwd_cell is not None and fwd_cell.type == 'lava':
                 done = True
-
-        # Pick up an object
-        elif action == self.actions.pickup:
-            if fwd_cell and fwd_cell.can_pickup():
-                if self.carrying is None:
-                    self.carrying = fwd_cell
-                    self.carrying.cur_pos = np.array([-1, -1])
-                    self.grid.set(*fwd_pos, None)
-
-        # Drop an object
-        elif action == self.actions.drop:
-            if not fwd_cell and self.carrying:
-                self.grid.set(*fwd_pos, self.carrying)
-                self.carrying.cur_pos = fwd_pos
-                self.carrying = None
+            # if fwd_cell is not None and fwd_cell.type == 'door':
+            #     pass
 
         # Toggle/activate an object
         elif action == self.actions.toggle:
             if fwd_cell:
                 fwd_cell.toggle(self, fwd_pos)
-
-        # Done action (not used by default)
-        elif action == self.actions.done:
-            pass
 
         else:
             assert False, "unknown action"
