@@ -47,13 +47,16 @@ class EmptyEnv(MiniGridEnv):
         return -dist
 
     def reset_task(self, task):
+        if task is None:
+            task = self.np_random.randint(0, self.size - 2, size=(2,))
         assert len(task) == 2, "Must in format of (col, row)"
         assert task[0] >= 0 and task[0] < self.size - 2
         assert task[1] >= 0 and task[1] < self.size - 2
         self.goal_pos = np.array(task)
 
     def sample_tasks(self, num_tasks):
-        tasks = self.np_random.randint(0, self.size - 2, size=(num_tasks, 2))
+        # tasks = self.np_random.randint(0, self.size - 2, size=(num_tasks, 2))
+        tasks = self.np_random.randint(3, 4, size=(num_tasks, 2))
         return tasks
     
 

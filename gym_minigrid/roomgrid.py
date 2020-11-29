@@ -164,7 +164,7 @@ class RoomGrid(MiniGridEnv):
                     room.door_pos[3] = room.neighbors[3].door_pos[1]
 
         # The agent starts in the upper left corner
-        self.agent_pos = (1, 1)
+        self.agent_pos = (2, 2)
         self.agent_dir = 0
 
     def place_in_room(self, i, j, obj):

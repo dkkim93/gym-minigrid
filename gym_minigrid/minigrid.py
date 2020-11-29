@@ -220,6 +220,7 @@ class Door(WorldObj):
         super().__init__('door', color)
         self.is_open = is_open
         self.is_locked = is_locked
+        assert self.is_open is not self.is_locked
 
     def can_overlap(self):
         """The agent can only walk over this cell when the door is open"""
@@ -241,13 +242,10 @@ class Door(WorldObj):
     #     return True
 
     def toggle(self, env, pos):
-        # Enabling easier opening door without requiring a key
         if self.is_locked:
-            self.is_locked = False
-            self.is_open = True
-            return True
-
-        self.is_open = not self.is_open
+            if np.linalg.norm(np.array(env.agent_pos) - np.array(env.door_pos)) <= 1.:
+                self.is_locked = False
+                self.is_open = True
         return True
 
     def encode(self):
