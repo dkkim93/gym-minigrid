@@ -761,57 +761,7 @@ class MiniGridEnv(gym.Env):
         A grid cell is represented by 2-character string, the first one for
         the object and the second one for the color.
         """
-
-        # Map of object types to short string
-        OBJECT_TO_STR = {
-            'wall': 'W',
-            'floor': 'F',
-            'door': 'D',
-            'key': 'K',
-            'ball': 'A',
-            'box': 'B',
-            'goal': 'G',
-            'lava': 'V',
-        }
-
-        # Map agent's direction to short string
-        AGENT_DIR_TO_STR = {
-            0: '>',
-            1: 'V',
-            2: '<',
-            3: '^'
-        }
-
-        str = ''
-
-        for j in range(self.grid.height):
-
-            for i in range(self.grid.width):
-                if i == self.agent_pos[0] and j == self.agent_pos[1]:
-                    str += 2 * AGENT_DIR_TO_STR[self.agent_dir]
-                    continue
-
-                c = self.grid.get(i, j)
-
-                if c is None:
-                    str += '  '
-                    continue
-
-                if c.type == 'door':
-                    if c.is_open:
-                        str += '__'
-                    elif c.is_locked:
-                        str += 'L' + c.color[0].upper()
-                    else:
-                        str += 'D' + c.color[0].upper()
-                    continue
-
-                str += OBJECT_TO_STR[c.type] + c.color[0].upper()
-
-            if j < self.grid.height - 1:
-                str += '\n'
-
-        return str
+        return str(type(self))
 
     def _gen_grid(self, width, height):
         assert False, "_gen_grid needs to be implemented by each environment"
@@ -1143,6 +1093,10 @@ class MiniGridEnv(gym.Env):
 
         # Get reward
         reward = self._reward()
+
+        if reward == 1.:
+            done = True
+            self.step_count = self.max_steps + 1
 
         if self.step_count >= self.max_steps:
             done = True

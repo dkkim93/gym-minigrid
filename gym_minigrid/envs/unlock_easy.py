@@ -10,29 +10,29 @@ class UnlockEasy(RoomGrid):
 
         self.possible_tasks = [
             # Bottom
-            # np.array([1, 6]),
-            # np.array([2, 6]),
-            # np.array([3, 6]),
-            # np.array([4, 6]),
-            # np.array([5, 6]),
-            # # Right
-            # np.array([6, 1]),
-            # np.array([6, 2]),
-            # np.array([6, 3]),
-            # np.array([6, 4]),
-            # np.array([6, 5]),
-            # # Left
-            # np.array([0, 1]),
-            # np.array([0, 2]),
-            # np.array([0, 3]),
+            np.array([1, 6]),
+            np.array([2, 6]),
+            np.array([3, 6]),
+            np.array([4, 6]),
+            np.array([5, 6]),
+            # Right
+            np.array([6, 1]),
+            np.array([6, 2]),
+            np.array([6, 3]),
+            np.array([6, 4]),
+            np.array([6, 5]),
+            # Left
+            np.array([0, 1]),
+            np.array([0, 2]),
+            np.array([0, 3]),
             np.array([0, 4]),
-            # np.array([0, 5]),
-            # # Top
-            # np.array([1, 0]),
-            # np.array([2, 0]),
-            # np.array([3, 0]),
-            # np.array([4, 0]),
-            # np.array([5, 0])
+            np.array([0, 5]),
+            # Top
+            np.array([1, 0]),
+            np.array([2, 0]),
+            np.array([3, 0]),
+            np.array([4, 0]),
+            np.array([5, 0])
         ]
 
         super().__init__(
@@ -66,7 +66,6 @@ class UnlockEasy(RoomGrid):
         # Compute done
         done = False
         if self.door.is_open:
-            print("door is opened", np.linalg.norm(np.array(self.agent_pos) - np.array(self.door_pos)))
             done = True
 
         if self.step_count >= self.max_steps:

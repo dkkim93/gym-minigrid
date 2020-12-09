@@ -9,7 +9,7 @@ class EmptyEnv(MiniGridEnv):
     def __init__(
         self,
         size=8,
-        agent_start_pos=(1, 1),
+        agent_start_pos=(3, 3),
         agent_start_dir=0,
     ):
         self.size = size + 2  # Considering the surrounding walls
@@ -55,8 +55,8 @@ class EmptyEnv(MiniGridEnv):
         self.goal_pos = np.array(task)
 
     def sample_tasks(self, num_tasks):
-        # tasks = self.np_random.randint(0, self.size - 2, size=(num_tasks, 2))
-        tasks = self.np_random.randint(3, 4, size=(num_tasks, 2))
+        tasks = self.np_random.randint(0, self.size - 2, size=(num_tasks, 2))
+        # tasks = self.np_random.randint(1, 2, size=(num_tasks, 2))
         return tasks
     
 
